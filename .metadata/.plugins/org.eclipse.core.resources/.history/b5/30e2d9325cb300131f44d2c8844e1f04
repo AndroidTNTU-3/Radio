@@ -1,0 +1,29 @@
+package com.example.radio;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+
+public class StationParser {
+	
+	public ArrayList<Station> parse(InputStream stream){
+		
+		
+		return null;
+		
+	}
+	
+	
+	
+	private int toInt(String value) {
+		int result = 0;
+
+		try {
+			result = Integer.parseInt(value);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+}

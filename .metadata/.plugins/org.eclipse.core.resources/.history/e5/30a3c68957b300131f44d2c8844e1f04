@@ -1,0 +1,8 @@
+package com.example.radio;
+
+public class Station {
+
+	private String id;
+	
+	
+}

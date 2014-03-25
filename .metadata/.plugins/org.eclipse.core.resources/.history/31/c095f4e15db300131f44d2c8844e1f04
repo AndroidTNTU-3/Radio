@@ -1,0 +1,89 @@
+package com.example.radio;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import android.util.Xml;
+
+public class StationParser {
+	
+	private static final String TAG_RADIO = "radio";
+	private static final String TAG_ID = "id";
+	private static final String TAG_NAME = "name";
+	private static final String TAG_COUNTRY = "country";
+	private static final String TAG_URL = "url";
+	
+	ArrayList<Station> arrayStation = new ArrayList<Station>();
+	Station station;
+	
+	public ArrayList<Station> parse(InputStream stream){
+		
+		XmlPullParser parser = Xml.newPullParser();
+		
+		try {
+			parser.setInput(stream, null);
+			int eventType = parser.getEventType(); 
+			while (eventType != XmlPullParser.END_DOCUMENT) {
+				String localName = parser.getName();
+				switch (eventType) {
+				case XmlPullParser.START_TAG:
+					if (TAG_RADIO.equals(localName)){
+						station = new Station();
+						arrayStation.add(station);
+					} else if (TAG_ID.equals(localName)){
+						station.setId(toInt(readText(parser)));
+					} else if (TAG_NAME.equals(localName)){
+						station.setName(readText(parser));
+					} else if (TAG_COUNTRY.equals(localName)){
+						station.setCountry(readText(parser));
+					} else if (TAG_URL.equals(localName)){
+						station.setUrl(readText(parser));
+					}
+					break;
+				}
+			}
+		} catch (XmlPullParserException e) {
+
+			e.printStackTrace();
+		}
+		
+		
+		return null;
+		
+	}
+	
+	
+	private String readText(XmlPullParser parser)  {
+		String result = "";
+		try {
+			if (parser.next() == XmlPullParser.TEXT) {
+				result = parser.getText();
+				parser.next();
+			}
+		} catch (XmlPullParserException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+		
+	private int toInt(String value) {
+		int result = 0;
+
+		try {
+			result = Integer.parseInt(value);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+}

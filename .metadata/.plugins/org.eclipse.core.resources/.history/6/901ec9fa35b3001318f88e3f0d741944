@@ -1,0 +1,66 @@
+package com.example.radio;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.app.Activity;
+import android.view.Menu;
+
+public class MainActivity extends Activity {
+	
+	private static final String USER = "student";
+	private static final String PASSWORD = "student";
+	private static final String URL = "http://android-course.comli.com/login.php?username=student&password=student";
+	
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        LoaderTask task = new LoaderTask();
+        task.execute(URL);
+    }
+    
+    public class LoaderTask extends AsyncTask<String, Void, Void>{
+
+		@Override
+		protected Void doInBackground(String... params) {
+			HttpGet httpRequest = null;
+
+            httpRequest = new HttpGet(params[0]);
+
+            HttpClient httpclient = new DefaultHttpClient();
+            
+            try {
+				HttpResponse response = (HttpResponse) httpclient.execute(httpRequest);
+				HttpEntity entity = response.getEntity();
+				InputStream stream = entity.getContent();
+				new Parser().parse(stream);
+			} catch (ClientProtocolException e) {			
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+            
+			return null;
+		}
+    	
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+    
+}

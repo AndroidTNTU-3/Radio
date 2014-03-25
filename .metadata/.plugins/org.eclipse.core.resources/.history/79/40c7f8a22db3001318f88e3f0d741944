@@ -1,0 +1,61 @@
+package com.example.radio;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import android.util.Xml;
+
+public class Parser {
+	
+	private static final String TAG_CODE = "code";
+	private static final String TAG_TOKEN = "token";
+	private static final String TAG_MESSAGE = "message";
+	
+	public ResponseInfo parse(InputStream stream){
+	
+	XmlPullParser parser = Xml.newPullParser();
+	
+	ResponseInfo info = new ResponseInfo();
+	
+	try {
+		parser.setInput(stream, null);
+		int eventType = parser.getEventType();
+		
+		while (eventType != XmlPullParser.END_DOCUMENT) {
+			String localName = parser.getName();
+			switch (eventType) {
+			case XmlPullParser.START_TAG:
+				if (TAG_CODE.equals(localName)) {
+					info.setCode(code)
+				}
+			break;
+			case XmlPullParser.TEXT:
+				if (mIsName && !mIsArtistContext) {
+					mAlbum.setName(parser.getText());
+				}
+				break;		
+				
+				try {
+					eventType = parser.next();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			
+		}
+		
+	} catch (XmlPullParserException e) {
+		e.printStackTrace();
+	}
+
+	
+	return null;
+	
+	}
+
+}
