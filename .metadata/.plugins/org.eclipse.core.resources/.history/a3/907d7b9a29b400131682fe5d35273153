@@ -67,8 +67,5 @@ public class Station implements Parcelable{
         country = parcel.readString();
         url = parcel.readString();
     }
-	public Station() {
-		// TODO Auto-generated constructor stub
-	}
 	
 }

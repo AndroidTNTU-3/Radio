@@ -80,13 +80,8 @@ public class StationParser {
 				
 			}
 		} catch (XmlPullParserException e) {
+
 			e.printStackTrace();
-		}finally {
-			try {
-				stream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 		
 		// check for the message

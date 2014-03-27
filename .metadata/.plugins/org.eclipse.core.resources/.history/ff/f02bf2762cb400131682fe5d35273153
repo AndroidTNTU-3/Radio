@@ -36,9 +36,7 @@ public class ListActivity extends Activity{
 		
 		stations = intent.getParcelableArrayListExtra("stations");
 				
-		mPullRefreshListView = (PullToRefreshListView) findViewById(R.id.pull_refresh_list);
-		
-		setList();
+		mPullRefreshListView = (PullToRefreshListView) findViewById(R.id.pull_refresh_list);				
 		
 	}
 

@@ -55,12 +55,6 @@ public class TokenParser {
 		
 	} catch (XmlPullParserException e) {
 		e.printStackTrace();
-	}finally {
-		try {
-			stream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	

@@ -45,7 +45,9 @@ public class MainActivity extends Activity implements ParserCallBack{
 	EditText editTextPassword;
 	Button btnSet;
 	
-	StationLoader stationLoader;	
+	StationLoader stationLoader;
+	
+	private ArrayList<Station> stationList;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +60,8 @@ public class MainActivity extends Activity implements ParserCallBack{
         btnSet.setOnClickListener(new MyListener());
         
         //LoaderTask task = new LoaderTask();
-  	  	stationLoader = new StationLoader();
-  	  	stationLoader.setParserCallBack(this);
+  	  stationLoader = new StationLoader();
+  	  stationLoader.setParserCallBack(this);
 
     }
     
@@ -96,9 +98,12 @@ public class MainActivity extends Activity implements ParserCallBack{
 	      
 	      if (result.getCode().equals(KEY_OK)){
 	    	  
-	    	  String url = "http://android-course.comli.com/radios.php?token=" + result.getToken();
-	    	  stationLoader.execute(url);
-	    	  	    	 	    	  
+
+	    	  String url1 = "http://android-course.comli.com/radios.php?token=" + result.getToken();
+	    	  stationLoader.execute(url1);
+	    	  
+	    	  
+	    	  
 	      } else if (result.getCode().equals(KEY_ERROR)){
 	    	  
 	    	  AlertDialog dialog = DialogScreen.getDialog(MainActivity.this, DialogScreen.IDD_TOKEN, result.getMessage());
@@ -142,9 +147,15 @@ public class MainActivity extends Activity implements ParserCallBack{
 
 	@Override
 	public void setInfo(ArrayList<Station> array) {
+		/*stationList = new ArrayList<String>();
+		
+		for (Station station: array){
+			stationList.add(station.getName());
+		}*/
 		
 		Intent intent = new Intent(getApplicationContext(), ListActivity.class);
-		intent.putParcelableArrayListExtra("stations", array);
+  	  	//intent.putExtra(KEY_TOKEN, result.getToken());
+		intent.putParcelableArrayListExtra("stationList", array);
   	  	startActivity(intent);
 		
 	}

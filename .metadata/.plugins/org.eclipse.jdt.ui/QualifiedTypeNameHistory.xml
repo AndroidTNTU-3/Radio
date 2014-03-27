@@ -29,4 +29,5 @@
 <fullyQualifiedTypeName name="android.content.Context"/>
 <fullyQualifiedTypeName name="android.content.DialogInterface"/>
 <fullyQualifiedTypeName name="com.example.radio.ResponseInfo"/>
+<fullyQualifiedTypeName name="android.os.Parcelable"/>
 </qualifiedTypeNameHistroy>

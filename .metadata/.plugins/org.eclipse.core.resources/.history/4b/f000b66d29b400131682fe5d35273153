@@ -2,7 +2,6 @@ package com.example.radio;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -11,9 +10,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.example.radio.StationLoader.ParserCallBack;
 import com.example.radio.entity.ResponseInfo;
-import com.example.radio.entity.Station;
 import com.example.radio.parser.TokenParser;
 
 import android.os.AsyncTask;
@@ -29,7 +26,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class MainActivity extends Activity implements ParserCallBack{
+public class MainActivity extends Activity {
 	
 	private static final String KEY_OK = "0";
 	private static final String KEY_ERROR = "1";
@@ -45,8 +42,6 @@ public class MainActivity extends Activity implements ParserCallBack{
 	EditText editTextPassword;
 	Button btnSet;
 	
-	StationLoader stationLoader;	
-	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,8 +53,6 @@ public class MainActivity extends Activity implements ParserCallBack{
         btnSet.setOnClickListener(new MyListener());
         
         //LoaderTask task = new LoaderTask();
-  	  	stationLoader = new StationLoader();
-  	  	stationLoader.setParserCallBack(this);
 
     }
     
@@ -95,10 +88,9 @@ public class MainActivity extends Activity implements ParserCallBack{
 	      Log.i("DEBUG", result.getToken());
 	      
 	      if (result.getCode().equals(KEY_OK)){
-	    	  
-	    	  String url = "http://android-course.comli.com/radios.php?token=" + result.getToken();
-	    	  stationLoader.execute(url);
-	    	  	    	 	    	  
+	    	  Intent intent = new Intent(getApplicationContext(), ListActivity.class);
+	    	  intent.putExtra(KEY_TOKEN, result.getToken());
+	    	  startActivity(intent);
 	      } else if (result.getCode().equals(KEY_ERROR)){
 	    	  
 	    	  AlertDialog dialog = DialogScreen.getDialog(MainActivity.this, DialogScreen.IDD_TOKEN, result.getMessage());
@@ -138,23 +130,5 @@ public class MainActivity extends Activity implements ParserCallBack{
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-
-
-	@Override
-	public void setInfo(ArrayList<Station> array) {
-		
-		Intent intent = new Intent(getApplicationContext(), ListActivity.class);
-		intent.putParcelableArrayListExtra("stations", array);
-  	  	startActivity(intent);
-		
-	}
-
-
-	@Override
-	public void setResponse(ResponseInfo response) {
-		AlertDialog dialog = DialogScreen.getDialog(MainActivity.this, DialogScreen.IDD_TOKEN, response.getMessage());
-        dialog.show();
-		
-	}
     
 }

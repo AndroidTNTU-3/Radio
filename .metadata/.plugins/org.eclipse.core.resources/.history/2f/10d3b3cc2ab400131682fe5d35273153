@@ -17,29 +17,35 @@ import android.util.Log;
 import android.view.Menu;
 import android.widget.ArrayAdapter;
 
-public class ListActivity extends Activity{
+public class ListActivity extends Activity implements ParserCallBack{
 		
+	private LinkedList<String> mListItems;
 	private PullToRefreshListView mPullRefreshListView;
 	private ArrayAdapter<String> mAdapter;
-		
+	
+	
 	private ArrayList<String> stationList;
 	private ArrayList<Station> stations;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_list);
-				
+		
+		StationLoader stationLoader = new StationLoader();
+		stationLoader.setParserCallBack(this);
+		
 		Intent intent = getIntent();		
+		String token = intent.getExtras().getString(MainActivity.KEY_TOKEN);
+		String url = "http://android-course.comli.com/radios.php?token=" + token;
+		
+		//stationLoader.execute(url);
+		stations = intent.getParcelableArrayListExtra("stationList");
+		for (Station station: stations){
+			stationList.add(station.getName());
+		}
+		
+		mPullRefreshListView = (PullToRefreshListView) findViewById(R.id.pull_refresh_list);				
 
-		stationList = new ArrayList<String>();
-		
-		stations = intent.getParcelableArrayListExtra("stations");
-				
-		mPullRefreshListView = (PullToRefreshListView) findViewById(R.id.pull_refresh_list);
-		
-		setList();
-		
 	}
 
 	@Override
@@ -47,16 +53,25 @@ public class ListActivity extends Activity{
 		getMenuInflater().inflate(R.menu.list, menu);
 		return true;
 	}
-	
-	public void setList(){
+
+	@Override
+	public void setInfo(ArrayList<Station> array) {
 		
-		for (Station station: stations){
-			//Log.i("DE:", station.getName());
+		
+		stationList = new ArrayList<String>();
+		
+		for (Station station: array){
 			stationList.add(station.getName());
 		}
-		
+
 		mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stationList);
 		mPullRefreshListView.setAdapter(mAdapter);
+	}
+	
+	@Override
+	public void setResponse(ResponseInfo response){
+		AlertDialog dialog = DialogScreen.getDialog(ListActivity.this, DialogScreen.IDD_TOKEN, response.getMessage());
+        dialog.show();
 	}
 
 }
