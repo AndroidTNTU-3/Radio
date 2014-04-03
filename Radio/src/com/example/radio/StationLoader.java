@@ -64,13 +64,14 @@ public class StationLoader extends AsyncTask<String, Void, Object> {
 	@Override
     protected void onPostExecute(Object result) {
       super.onPostExecute(result);
-      
+      Log.i("DEBUG SET", "In Post exec");
       
       if (parserCallBack != null){
     	 if (result instanceof ArrayList<?>)
   		parserCallBack.setInfo((ArrayList<Station>) result);
     	 else if (result instanceof ResponseInfo) parserCallBack.setResponse((ResponseInfo) result);
   		}
+      
       
 	}
 	

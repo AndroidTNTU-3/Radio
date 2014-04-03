@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.radio.ListActivity"
+            android:name="com.example.radio.MyRefreshListActivity"
             android:label="@string/title_activity_list" >
         </activity>
     </application>

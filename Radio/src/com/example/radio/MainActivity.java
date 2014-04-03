@@ -38,6 +38,7 @@ public class MainActivity extends Activity implements ParserCallBack{
 	private  String user = "";
 	private  String password = "";
 	private  String url = "";//"http://android-course.comli.com/login.php?username=student&password=student";
+	String url_token;
 	
 	ResponseInfo info;
 	
@@ -96,8 +97,8 @@ public class MainActivity extends Activity implements ParserCallBack{
 	      
 	      if (result.getCode().equals(KEY_OK)){
 	    	  
-	    	  String url = "http://android-course.comli.com/radios.php?token=" + result.getToken();
-	    	  stationLoader.execute(url);
+	    	  url_token = "http://android-course.comli.com/radios.php?token=" + result.getToken();
+	    	  stationLoader.execute(url_token);
 	    	  	    	 	    	  
 	      } else if (result.getCode().equals(KEY_ERROR)){
 	    	  
@@ -143,8 +144,9 @@ public class MainActivity extends Activity implements ParserCallBack{
 	@Override
 	public void setInfo(ArrayList<Station> array) {
 		
-		Intent intent = new Intent(getApplicationContext(), ListActivity.class);
+		Intent intent = new Intent(getApplicationContext(), MyRefreshListActivity.class);
 		intent.putParcelableArrayListExtra("stations", array);
+		intent.putExtra("url_token", url_token);
   	  	startActivity(intent);
 		
 	}
