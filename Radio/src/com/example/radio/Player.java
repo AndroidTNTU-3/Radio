@@ -12,13 +12,11 @@ import android.util.Log;
 class Player extends AsyncTask<String, Void, Boolean> {
     private ProgressDialog progress;
     private MediaPlayer mediaPlayer;
-    private boolean intialStage = true;
     Context context;
     
     public Player(Context context, MediaPlayer mmediaPlayer) {
-    	this.context = context;
-    	
-        	mediaPlayer = mmediaPlayer;
+    	this.context = context;   	
+      	mediaPlayer = mmediaPlayer;
 
         progress = new ProgressDialog(context);
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -36,27 +34,13 @@ class Player extends AsyncTask<String, Void, Boolean> {
     
     @Override
     protected Boolean doInBackground(String... params) {
-        // TODO Auto-generated method stub
-    	 if (isCancelled()) return null;
         Boolean prepared;
         try {
-
-            mediaPlayer.setDataSource(params[0]);
-           
-           /*mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
-
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    // TODO Auto-generated method stub
-                    intialStage = true;
-                    //playPause=false;
-                    //btn.setBackgroundResource(R.drawable.button_play);
-                    mediaPlayer.stop();
-                    mediaPlayer.reset();
-                }
-            });*/
+        	
+            mediaPlayer.setDataSource(params[0]);           
             mediaPlayer.prepare();
             prepared = true;
+            
         } catch (IllegalArgumentException e) {
             // TODO Auto-generated catch block
             Log.d("IllegarArgument", e.getMessage());
@@ -88,14 +72,7 @@ class Player extends AsyncTask<String, Void, Boolean> {
         Log.d("Prepared", "//" + result);
         mediaPlayer.start();
 
-        intialStage = false;
-        this.cancel(true);
     }
     
-    @Override
-    protected void onCancelled() {
-      super.onCancelled();
-      Log.i("DEBUF Onck", "In cancel");
-    }
    
 }

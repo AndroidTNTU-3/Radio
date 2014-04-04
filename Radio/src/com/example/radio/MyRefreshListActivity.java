@@ -1,18 +1,13 @@
 package com.example.radio;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 
 import com.example.radio.StationLoader.ParserCallBack;
 import com.example.radio.entity.ResponseInfo;
 import com.example.radio.entity.Station;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
-import com.handmark.pulltorefresh.library.PullToRefreshBase.OnLastItemVisibleListener;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
-import com.handmark.pulltorefresh.library.PullToRefreshBase.State;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import android.media.MediaPlayer;
@@ -25,12 +20,12 @@ import android.content.Intent;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 public final class MyRefreshListActivity extends ListActivity  implements ParserCallBack{
 		
@@ -45,8 +40,9 @@ public final class MyRefreshListActivity extends ListActivity  implements Parser
 	
 	private MediaPlayer mediaPlayer;
 	
-	boolean playerIsOne = false;
+	boolean playerIsFirst = false;	
 	Player player;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -58,7 +54,8 @@ public final class MyRefreshListActivity extends ListActivity  implements Parser
 		
 		mediaPlayer = new MediaPlayer();
 		
-		
+		getActionBar().setDisplayShowHomeEnabled(false);
+				
 		stations = intent.getParcelableArrayListExtra("stations");
 		url_token = intent.getStringExtra("url_token");
 				
@@ -71,10 +68,10 @@ public final class MyRefreshListActivity extends ListActivity  implements Parser
 					long id) {
 				String url = stations.get(position - 1).getUrl();
 
-				if (!playerIsOne) {
+				if (!playerIsFirst) {
 					player = new Player(MyRefreshListActivity.this, mediaPlayer);
 					player.execute(url);
-					playerIsOne = true;
+					playerIsFirst = true;
 				} else {
 					// check if you have selected another radioStation
 					mediaPlayer.stop();
@@ -104,8 +101,6 @@ public final class MyRefreshListActivity extends ListActivity  implements Parser
 		setList();
 		
 	}
-	
-	
 	
 	private void onRefresh(){
 		
@@ -139,6 +134,28 @@ public final class MyRefreshListActivity extends ListActivity  implements Parser
 		getMenuInflater().inflate(R.menu.list, menu);
 		return true;
 	}
+	
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.action_play_pause:
+        	if (mediaPlayer.isPlaying()){
+        	mediaPlayer.pause();
+        	item.setIcon(android.R.drawable.ic_media_play);
+        	} else if (!mediaPlayer.isPlaying()){
+        		mediaPlayer.start();
+            	item.setIcon(android.R.drawable.ic_media_pause);
+        	}      	
+            return true;
+        case R.id.action_stop:
+        	mediaPlayer.stop();
+            return true;
+       
+        default:
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
 	
 	public void setList(){
 		

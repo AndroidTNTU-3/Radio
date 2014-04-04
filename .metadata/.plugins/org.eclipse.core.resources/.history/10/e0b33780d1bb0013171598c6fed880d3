@@ -1,0 +1,164 @@
+package com.example.radio;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import com.example.radio.StationLoader.ParserCallBack;
+import com.example.radio.entity.ResponseInfo;
+import com.example.radio.entity.Station;
+import com.example.radio.parser.TokenParser;
+
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.util.Log;
+import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+
+public class MainActivity extends Activity implements ParserCallBack{
+	
+	private static final String KEY_OK = "0";
+	private static final String KEY_ERROR = "1";
+	public static final String KEY_TOKEN = "token";
+	
+	private  String user = "";
+	private  String password = "";
+	private  String url = "";//"http://android-course.comli.com/login.php?username=student&password=student";
+	String url_token;
+	
+	ResponseInfo info;
+	
+	EditText editTextUser;
+	EditText editTextPassword;
+	Button btnSet;
+	
+	StationLoader stationLoader;	
+	
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        
+        editTextUser = (EditText) findViewById(R.id.editUser);
+        editTextUser.setHint(getResources().getText(R.string.title_login));
+        editTextPassword = (EditText) findViewById(R.id.editPassword);
+        btnSet = (Button) findViewById(R.id.btnSet);
+        editTextPassword.setHint(getResources().getText(R.string.title_password));
+        btnSet.setOnClickListener(new MyListener());
+        
+        //LoaderTask task = new LoaderTask();
+  	  	stationLoader = new StationLoader();
+  	  	stationLoader.setParserCallBack(this);
+
+    }
+    
+    public class LoaderTask extends AsyncTask<String, Void, ResponseInfo>{
+
+		@Override
+		protected ResponseInfo doInBackground(String... params) {
+			HttpGet httpRequest = null;
+
+            httpRequest = new HttpGet(params[0]);
+
+            HttpClient httpclient = new DefaultHttpClient();
+            
+            try {
+				HttpResponse response = (HttpResponse) httpclient.execute(httpRequest);
+				HttpEntity entity = response.getEntity();
+				InputStream stream = entity.getContent();
+				info = new TokenParser().parse(stream);
+			} catch (ClientProtocolException e) {			
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+            
+			return info;
+		}
+		
+		@Override
+	    protected void onPostExecute(ResponseInfo result) {
+	      super.onPostExecute(result);
+	      
+	      Log.i("DEBUG", result.getCode());
+	      Log.i("DEBUG", result.getToken());
+	      
+	      if (result.getCode().equals(KEY_OK)){
+	    	  
+	    	  url_token = "http://android-course.comli.com/radios.php?token=" + result.getToken();
+	    	  stationLoader.execute(url_token);
+	    	  	    	 	    	  
+	      } else if (result.getCode().equals(KEY_ERROR)){
+	    	  
+	    	  AlertDialog dialog = DialogScreen.getDialog(MainActivity.this, DialogScreen.IDD_TOKEN, result.getMessage());
+	          dialog.show();
+	    	 
+	      }
+	      
+    	}
+    	
+    }
+    
+    private class MyListener implements OnClickListener{
+
+		@Override
+		public void onClick(View v) {
+			switch(v.getId()){
+			case R.id.btnSet:
+				user = editTextUser.getText().toString();
+				password = editTextPassword.getText().toString();
+				if (user.length() == 0) editTextUser.setError("Please enter your user name");
+				else if (password.length() < 6) editTextPassword.setError ("Password must be not less 6 symbol");
+				else {
+					url = "http://android-course.comli.com/login.php?username=" + user + "&password=" + password;
+					new LoaderTask().execute(url);
+				}
+				break;
+			}
+			
+		}
+    	
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+
+	@Override
+	public void setInfo(ArrayList<Station> array) {
+		
+		Intent intent = new Intent(getApplicationContext(), MyRefreshListActivity.class);
+		intent.putParcelableArrayListExtra("stations", array);
+		intent.putExtra("url_token", url_token);
+  	  	startActivity(intent);
+		
+	}
+
+
+	@Override
+	public void setResponse(ResponseInfo response) {
+		AlertDialog dialog = DialogScreen.getDialog(MainActivity.this, DialogScreen.IDD_TOKEN, response.getMessage());
+        dialog.show();
+		
+	}
+    
+}

@@ -20,7 +20,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
@@ -53,9 +52,13 @@ public class MainActivity extends Activity implements ParserCallBack{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        Bundle dataBundle=new Bundle();
+        
         editTextUser = (EditText) findViewById(R.id.editUser);
+        editTextUser.setHint(getResources().getText(R.string.title_login));
         editTextPassword = (EditText) findViewById(R.id.editPassword);
         btnSet = (Button) findViewById(R.id.btnSet);
+        editTextPassword.setHint(getResources().getText(R.string.title_password));
         btnSet.setOnClickListener(new MyListener());
         
         //LoaderTask task = new LoaderTask();

@@ -8,7 +8,6 @@
 <fullyQualifiedTypeName name="java.io.InputStream"/>
 <fullyQualifiedTypeName name="android.widget.EditText"/>
 <fullyQualifiedTypeName name="android.widget.Button"/>
-<fullyQualifiedTypeName name="com.example.radio.R.id"/>
 <fullyQualifiedTypeName name="com.handmark.pulltorefresh.library.PullToRefreshListView"/>
 <fullyQualifiedTypeName name="android.widget.ArrayAdapter"/>
 <fullyQualifiedTypeName name="java.util.LinkedList"/>
@@ -39,6 +38,12 @@
 <fullyQualifiedTypeName name="android.util.Log"/>
 <fullyQualifiedTypeName name="java.io.IOException"/>
 <fullyQualifiedTypeName name="android.content.Context"/>
-<fullyQualifiedTypeName name="com.example.radio.R.drawable"/>
 <fullyQualifiedTypeName name="android.media.MediaPlayer"/>
+<fullyQualifiedTypeName name="android.view.MenuItem"/>
+<fullyQualifiedTypeName name="com.example.radio.R.drawable"/>
+<fullyQualifiedTypeName name="android.R"/>
+<fullyQualifiedTypeName name="android.R.drawable"/>
+<fullyQualifiedTypeName name="com.example.radio.R"/>
+<fullyQualifiedTypeName name="com.example.radio.R.id"/>
+<fullyQualifiedTypeName name="com.example.radio.R.string"/>
 </qualifiedTypeNameHistroy>
