@@ -150,6 +150,7 @@ public class MainActivity extends Activity implements ParserCallBack{
 		Intent intent = new Intent(getApplicationContext(), MyRefreshListActivity.class);
 		intent.putParcelableArrayListExtra("stations", array);
 		intent.putExtra("url_token", url_token);
+		
   	  	startActivity(intent);
 		
 	}

@@ -38,7 +38,6 @@
 <fullyQualifiedTypeName name="android.util.Log"/>
 <fullyQualifiedTypeName name="java.io.IOException"/>
 <fullyQualifiedTypeName name="android.content.Context"/>
-<fullyQualifiedTypeName name="android.media.MediaPlayer"/>
 <fullyQualifiedTypeName name="android.view.MenuItem"/>
 <fullyQualifiedTypeName name="com.example.radio.R.drawable"/>
 <fullyQualifiedTypeName name="android.R"/>
@@ -46,4 +45,16 @@
 <fullyQualifiedTypeName name="com.example.radio.R"/>
 <fullyQualifiedTypeName name="com.example.radio.R.id"/>
 <fullyQualifiedTypeName name="com.example.radio.R.string"/>
+<fullyQualifiedTypeName name="android.media.MediaPlayer"/>
+<fullyQualifiedTypeName name="com.example.radio.PlayerService.Player"/>
+<fullyQualifiedTypeName name="android.os.Binder"/>
+<fullyQualifiedTypeName name="android.app.Service"/>
+<fullyQualifiedTypeName name="android.content.ServiceConnection"/>
+<fullyQualifiedTypeName name="com.example.radio.PlayerService.MediaPlayerBinder"/>
+<fullyQualifiedTypeName name="android.content.ComponentName"/>
+<fullyQualifiedTypeName name="android.app.ActivityManager"/>
+<fullyQualifiedTypeName name="android.app.ActivityManager.RunningServiceInfo"/>
+<fullyQualifiedTypeName name="android.media.MediaPlayer.OnPreparedListener"/>
+<fullyQualifiedTypeName name="com.example.radio.PlayerService.MPlayer"/>
+<fullyQualifiedTypeName name="com.example.radio.PlayerService.IMediaPlayerServiceCallBack"/>
 </qualifiedTypeNameHistroy>

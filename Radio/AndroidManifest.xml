@@ -30,6 +30,7 @@
             android:name="com.example.radio.MyRefreshListActivity"
             android:label="@string/title_activity_list" >
         </activity>
+        <service android:name="PlayerService"></service>
     </application>
 
 </manifest>

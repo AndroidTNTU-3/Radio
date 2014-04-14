@@ -1,0 +1,271 @@
+package com.example.radio;
+
+import java.util.ArrayList;
+
+import com.example.radio.PlayerService.IMediaPlayerServiceCallBack;
+import com.example.radio.StationLoader.ParserCallBack;
+import com.example.radio.entity.ResponseInfo;
+import com.example.radio.entity.Station;
+
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
+import android.media.MediaPlayer;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
+import android.app.AlertDialog;
+import android.app.ListActivity;
+import android.app.ProgressDialog;
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.text.format.DateUtils;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+public final class MyRefreshListActivity extends ListActivity  implements ParserCallBack, IMediaPlayerServiceCallBack {
+		
+	private PullToRefreshListView mPullRefreshListView;
+	private ArrayAdapter<String> mAdapter;
+		
+	private ArrayList<String> stationList;
+	private ArrayList<Station> stations;
+	
+	StationLoader stationLoader;
+	String url_token = "";
+	
+	private MediaPlayer mediaPlayer;
+	
+	boolean playerIsFirst = false;	
+	Player player;
+	PlayerService playerService;
+	Intent intent;
+	ServiceConnection sConn;
+	Intent intentService;
+	MediaPlayer mmediaPlayer;
+	boolean bound = false; 			//check if activity connected to service
+	
+	private ProgressDialog progress;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_list);
+		
+		intent = getIntent();	
+		if (MediaPlayerServiceRunning()){
+			stations = intent.getParcelableArrayListExtra("stations");		
+			
+		} else {
+			
+			stations = intent.getParcelableArrayListExtra("stations");
+			url_token = intent.getStringExtra("url_token");
+		}
+						
+			
+		stationList = new ArrayList<String>();
+		
+		mediaPlayer = new MediaPlayer();
+				
+		getActionBar().setDisplayShowHomeEnabled(false);
+										
+		mPullRefreshListView = (PullToRefreshListView) findViewById(R.id.pull_refresh_list);
+				
+		sConn = new ServiceConnection() {
+
+		      public void onServiceConnected(ComponentName name, IBinder binder) {
+		        //Log.d(LOG_TAG, "MainActivity onServiceConnected");
+		        playerService = ((PlayerService.MediaPlayerBinder) binder).getService(); 
+		       
+		        mmediaPlayer = playerService.getMediaPlayer();
+		        //bound = true;
+		      }
+
+		      public void onServiceDisconnected(ComponentName name) {
+		        //Log.d(LOG_TAG, "MainActivity onServiceDisconnected");
+		        //bound = false;
+		      }
+
+		      
+		    }; 
+		    
+		    bindToService(null);
+		
+		mPullRefreshListView.getRefreshableView().setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View v, int position,
+					long id) {
+				String url = stations.get(position - 1).getUrl();
+				
+				progress = new ProgressDialog(MyRefreshListActivity.this);
+				progress.setMessage("Buffering...");
+			    progress.show();
+				
+				bindToService(url);								    
+			    playerService.setStations(stations);
+			
+			}
+		});
+		
+		
+		mPullRefreshListView.setOnRefreshListener(new OnRefreshListener<ListView>() {
+		    @Override
+		    public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+
+		    	String label = DateUtils.formatDateTime(getApplicationContext(), System.currentTimeMillis(),
+						DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
+
+				// Update the LastUpdatedLabel
+				refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+		        // Do work to refresh the list here.
+		       new GetDataTask().execute();
+		    	
+		    }
+		});
+						
+		setList();
+		
+	}
+	
+	private void onRefresh(){
+		
+		//create new asyncTask StationLoader
+		stationLoader = new StationLoader();
+  	  	stationLoader.setParserCallBack(this);
+    	stationLoader.execute(url_token);
+	}
+	
+	private class GetDataTask extends AsyncTask<Void, Void, String[]> {
+	   
+		@Override
+		protected String[] doInBackground(Void... arg0) {
+
+			return null;
+		}
+		
+		@Override
+	    protected void onPostExecute(String[] result) {
+	        // Call onRefreshComplete when the list has been refreshed.
+			
+			onRefresh();
+	    	mPullRefreshListView.onRefreshComplete();
+	        super.onPostExecute(result);
+	    }
+	}
+	
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.list, menu);
+		return true;
+	}
+	
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.action_play_pause:
+        	if (playerService.isPlayerPlaying()){       	
+        	playerService.onPausePlayer();
+        	item.setIcon(android.R.drawable.ic_media_play);
+        	} else if (!mediaPlayer.isPlaying()){
+        		playerService.onStartPlayer();
+            	item.setIcon(android.R.drawable.ic_media_pause);
+        	}      	
+            return true;
+        case R.id.action_stop:
+        	playerService.onStopPlayer();      	        	
+            return true;
+       
+        default:
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+	
+	
+	
+	public void bindToService(String url) {
+		intentService = new Intent(getApplicationContext(), PlayerService.class);
+
+        if (MediaPlayerServiceRunning()) {
+            // Bind to LocalService
+
+            bindService(intentService, sConn, getApplicationContext().BIND_AUTO_CREATE);
+    		playerService.setOnPlayerServiceCallBack(this);
+            if (url != null) playerService.startPlayer(url);
+            bound = true;
+                       
+        }
+        else {
+            startService(intentService);
+            bindService(intentService, sConn, getApplicationContext().BIND_AUTO_CREATE);
+            bound = true;
+        }
+ 
+    }
+	
+	private boolean MediaPlayerServiceRunning() {
+		 
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+ 
+        for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if ("com.example.radio.PlayerService".equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+ 
+        return false;
+    }
+	
+	public void setList(){
+		
+		for (Station station: stations){
+			
+			stationList.add(station.getName());
+		}
+		
+		mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stationList);
+		mPullRefreshListView.setAdapter(mAdapter);
+	}
+
+	@Override
+	public void setInfo(ArrayList<Station> array) {
+		stations = array;
+		setList();
+	}
+
+	@Override
+	public void setResponse(ResponseInfo response) {
+		// TODO Auto-generated method stub
+		
+	}	
+	
+	@Override
+	  protected void onStop() {
+	    super.onStop();
+	    if (!bound) return;
+	    unbindService(sConn);		//Disconnect from the service
+	    bound = false;
+	  }
+
+	@Override
+	public void onMediaPlayerPrapared() {
+		if (progress.isShowing()) {
+            progress.cancel();
+        }
+	}
+
+}
