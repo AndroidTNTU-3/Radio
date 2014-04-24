@@ -30,7 +30,37 @@
             android:name="com.example.radio.MyRefreshListActivity"
             android:label="@string/title_activity_list" >
         </activity>
-        <service android:name="PlayerService"></service>
+        
+        <service android:name="PlayerService">
+            <intent-filter>
+				<action android:name="com.exmple.radio.STOP" />
+				<action android:name="com.exmple.radio.PLAY" />
+				<action android:name="com.exmple.radio.PAUSE" />
+				<action android:name="com.exmple.radio.SET_STATION" />
+			</intent-filter>           
+        </service>
+
+        <receiver
+            android:name="PlayerWidget"
+            android:logo="@string/widget_name"
+            android:previewImage="@drawable/widget_preview"
+		
+             >
+            
+            <intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+			    <action android:name="com.example.radio.ACTION_WIDGET_RECEIVER" />
+			    <action android:name="com.example.radio.ACTION_SET_STATION" />
+            </intent-filter>
+            
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_metadata" 
+>
+            </meta-data>
+
+        </receiver>
+
     </application>
 
 </manifest>

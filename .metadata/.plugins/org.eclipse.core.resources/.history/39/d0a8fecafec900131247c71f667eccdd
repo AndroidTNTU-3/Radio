@@ -1,0 +1,7 @@
+package com.example.radio;
+
+import android.appwidget.AppWidgetProvider;
+
+public class PlayerWidget extends AppWidgetProvider {
+
+}

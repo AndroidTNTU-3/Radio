@@ -10,18 +10,28 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
+import android.media.AudioTrack.OnPlaybackPositionUpdateListener;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 public class PlayerService extends Service {
+	
+	
+	public static final String STOP = "com.exmple.radio.STOP";
+	public static final String PLAY = "com.exmple.radio.PLAY";
+	public static final String PAUSE = "com.exmple.radio.PAUSE";
+	public static final String SET_STATION = "com.exmple.radio.SET_STATION";
 	
 	public interface IMediaPlayerServiceCallBack {
 		public void onMediaPlayerPrapared();
@@ -50,6 +60,25 @@ public class PlayerService extends Service {
 		mediaPlayer = new MediaPlayer();	
 	}
 	
+	 public int onStartCommand(Intent intent, int flags, int startId) {
+		 
+		 if (intent != null) {
+			 
+				String action = intent.getAction();	
+				if (STOP.equals(action)) {
+					onStopPlayer();
+				} else if (PLAY.equals(action)){
+					onStartPlayer();
+				} else if (PAUSE.equals(action)){
+					onPausePlayer();
+				} else if (SET_STATION.equals(action)){
+					sendInfoWidget(nameStation);
+				}
+		 }
+		    
+		    return super.onStartCommand(intent, flags, startId);
+	 }
+	
 	public class MediaPlayerBinder extends Binder {
         /**
          * Returns the instance of this service for a client to make method calls on it.
@@ -69,15 +98,14 @@ public class PlayerService extends Service {
         return mediaPlayer;
     }
 	
-	 public int onStartCommand(Intent intent, int flags, int startId) {
-		   				    
-		    return super.onStartCommand(intent, flags, startId);
-		  }
+
 	 
 	 public void onStopPlayer(){
 		 Log.d("DEBUG", "In stop");
 		 mediaPlayer.stop();
 		 mediaPlayer.release();
+		 nameStation = "";
+		 sendInfoWidget(nameStation);
 		 nm.cancel(1);
 	 }
 	 
@@ -133,7 +161,7 @@ public class PlayerService extends Service {
 		        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 		        try {
 					mediaPlayer.setDataSource(url);
-					 mediaPlayer.prepareAsync();
+					mediaPlayer.prepareAsync();
 				} catch (IllegalArgumentException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -155,6 +183,7 @@ public class PlayerService extends Service {
 			public void onPrepared(MediaPlayer mp) {
 				Log.d("DEBUG", "Player is Prepared");
 				sendNotif();
+		        sendInfoWidget(nameStation);
 				mpCallBack.onMediaPlayerPrapared();
 				mediaPlayer.start();
 				
@@ -162,6 +191,22 @@ public class PlayerService extends Service {
 		 
 	 }
 	 
+	/*private void sendInfoToWidget(){
+		 Intent intent = new Intent(PlayerWidget.ACTION_SET_STATION);
+		 intent.putExtra("nameStation", nameStation);
+		 sendBroadcast(intent);
+	 }*/
+	 
+	 private void sendInfoWidget(String nameStation){
+		 
+		 AppWidgetManager manager = AppWidgetManager.getInstance(this.getApplicationContext());
+		 ComponentName thisWidget = new ComponentName(this.getApplicationContext(), PlayerWidget.class);
+		 
+		 RemoteViews remoteView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.widget);
+		 remoteView.setTextViewText(R.id.tvwStation,nameStation);
+		 
+		 manager.updateAppWidget(thisWidget, remoteView);
+	 }
 	 
 	 void sendNotif() {
 		 nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -180,7 +225,7 @@ public class PlayerService extends Service {
 		    
 		  }
 	
-	private class Player extends AsyncTask<String, Void, Boolean> {
+	/* private class Player extends AsyncTask<String, Void, Boolean> {
 	    private ProgressDialog progress;
 	    private MediaPlayer mediaPlayer;
 	    Context context;
@@ -188,8 +233,6 @@ public class PlayerService extends Service {
 	    public Player(Context context, MediaPlayer mmediaPlayer) {
 	    	this.context = context;   	
 	      	mediaPlayer = mmediaPlayer;
-
-	       // progress = new ProgressDialog(context);
 	        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 	    }
 
@@ -198,8 +241,6 @@ public class PlayerService extends Service {
 	    protected void onPreExecute() {
 	        // TODO Auto-generated method stub
 	        super.onPreExecute();
-	       // this.progress.setMessage("Buffering...");
-	       // this.progress.show();
 
 	    }
 	    
@@ -236,19 +277,14 @@ public class PlayerService extends Service {
 	    @Override
 	    protected void onPostExecute(Boolean result) {
 	        // TODO Auto-generated method stub
-	        super.onPostExecute(result);
-	      /*  if (progress.isShowing()) {
-	            progress.cancel();
-	        }
-	        Log.d("Prepared", "//" + result);*/
+	        super.onPostExecute(result);	  
 	        sendNotif();
-
 	        mediaPlayer.start();
 
 	    }
 	    
 	   
-	}
+	}*/
 
 	public void setOnPlayerServiceCallBack(IMediaPlayerServiceCallBack mpCallBack) {		
 		this.mpCallBack = mpCallBack;

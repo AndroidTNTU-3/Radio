@@ -1,0 +1,112 @@
+package com.example.radio;
+
+import java.util.Arrays;
+
+
+
+
+
+import android.app.ActivityManager;
+import android.app.PendingIntent;
+import android.app.ActivityManager.RunningServiceInfo;
+import android.app.PendingIntent.CanceledException;
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
+import android.widget.RemoteViews;
+
+public class PlayerWidget extends AppWidgetProvider {
+	
+	public static String ACTION_WIDGET_RECEIVER = "ActionReceiverWidget";
+	public static String ACTION_SET_STATION = "com.example.radio.ACTION_SET_STATION";
+	
+	final String LOG_TAG = "myLogs";
+
+	  @Override
+	  public void onEnabled(Context context) {
+	    super.onEnabled(context);
+	    /*ComponentName service = new ComponentName(context, PlayerService.class);	
+	    Intent intent = new Intent(PlayerService.SET_ID).setComponent(service);
+		PendingIntent pIntentStop = PendingIntent.getService(context, 0, intent, 0);
+		try {
+			pIntentStop.send();
+		} catch (CanceledException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+	    Log.d(LOG_TAG, "onEnabled");
+	  }
+
+	  @Override
+	  public void onUpdate(Context context, AppWidgetManager appWidgetManager,
+	      int[] appWidgetIds) {
+	    super.onUpdate(context, appWidgetManager, appWidgetIds);
+	    Log.d(LOG_TAG, "onUpdate");
+	    
+	    for (int i : appWidgetIds) {
+	        updateWidget(context, appWidgetManager, i);
+	      }	    	   	    
+	  }
+	  	 
+	  static void updateWidget(Context context, AppWidgetManager appWidgetManager, int widgetID){
+		  
+		  Log.d("DEBUG", "onUpdateWidget");    
+		  RemoteViews widgetView = new RemoteViews(context.getPackageName(),
+		            R.layout.widget);
+		  
+		  ComponentName service = new ComponentName(context, PlayerService.class);		  
+		  
+		  Intent intentStop = new Intent(PlayerService.STOP).setComponent(service);
+		  PendingIntent pIntentStop = PendingIntent.getService(context, 0, intentStop, 0);	    
+		  widgetView.setOnClickPendingIntent(R.id.wbuttonStop, pIntentStop);
+		  
+		  Intent intentPlay = new Intent(PlayerService.PLAY).setComponent(service);
+		  PendingIntent pIntentPlay = PendingIntent.getService(context, 0, intentPlay, 0);	    
+		  widgetView.setOnClickPendingIntent(R.id.wbuttonPlay, pIntentPlay);
+		  
+		  Intent intentPause = new Intent(PlayerService.PAUSE).setComponent(service);
+		  PendingIntent pIntentPause = PendingIntent.getService(context, 0, intentPause, 0);	    
+		  widgetView.setOnClickPendingIntent(R.id.wbuttonPause, pIntentPause);
+		  
+		  appWidgetManager.updateAppWidget(widgetID, widgetView);
+	  }
+	  
+	  @Override
+      public void onReceive(Context context, Intent intent) {
+		  Log.d("DEBUG", "onRecive");
+		  String action = intent.getAction();
+		  		  
+		 /* if (ACTION_SET_STATION.equals(action)){
+			  getWidgetId(intent);
+			  String nameStation = intent.getStringExtra("nameStation");
+			  Log.d("DEBUG", "onStationREcive" + nameStation);
+			  RemoteViews widgetView = new RemoteViews(context.getPackageName(),
+			            R.layout.widget);
+			  widgetView.setTextViewText(R.id.tvwStation, nameStation);
+		  }*/
+		  
+           super.onReceive(context, intent);
+     }
+	  
+	  
+	  @Override
+	  public void onDeleted(Context context, int[] appWidgetIds) {
+	    super.onDeleted(context, appWidgetIds);
+	    Log.d(LOG_TAG, "onDeleted " + Arrays.toString(appWidgetIds));
+	  }
+
+	  @Override
+	  public void onDisabled(Context context) {
+	    super.onDisabled(context);
+	    Log.d(LOG_TAG, "onDisabled");
+	  }
+	  	 	  
+	  
+}

@@ -152,7 +152,7 @@ public class MainActivity extends Activity implements ParserCallBack{
 		intent.putExtra("url_token", url_token);
 		
   	  	startActivity(intent);
-		
+  	  	finish();
 	}
 
 

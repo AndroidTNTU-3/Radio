@@ -13,4 +13,5 @@
 	<string name="action_pause">Pause</string>
 	<string name="title_login">login</string>
 	<string name="title_password">password</string>
+	<string name="widget_name">StreamPlayer</string>
 </resources>
